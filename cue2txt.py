@@ -68,25 +68,6 @@ def extract_groups_from_string(text, pattern):
     return matches
 
 # -----------------------------------------------------------
-def show_res(tmp_dict2):
-
-    # print ("tmp_dict2")
-
-    for key in tmp_dict2:
-        value = tmp_dict2[key]
-        #print(f'Ключ: {key}')
-        #print(f'Ключ: {value["track_no"]} - {value["title"]} ({value["performer"]})')
-        
-        track_no = value.get("track_no", "")
-        title = value.get("title", "Без названия")
-        performer = value.get("performer", "")
-        index0 = value.get("index0", "")
-        index1 = value.get("index1", "")
-
-        print(f'{track_no}. {performer} - {title} ({index1})')
-        #pprint(value)
-
-# -----------------------------------------------------------
 def run_parse(content):
         
     content = list(filter(None, content.split('\n')))
@@ -166,7 +147,8 @@ def run_parse(content):
         #print(f'    fields_dict: {fields_dict}')
         tmp_dict2[str(key)] = fields_dict
         
-    show_res(tmp_dict2)
+    #show_res(tmp_dict2)
+    return tmp_dict2
 
 # -----------------------------------------------------------
 '''
@@ -185,11 +167,57 @@ def read_file(filename):
 '''
 
 # -----------------------------------------------------------
+def show_res(tmp_dict2):
+
+    # print ("tmp_dict2")
+
+    for key in tmp_dict2:
+        value = tmp_dict2[key]
+        #print(f'Ключ: {key}')
+        #print(f'Ключ: {value["track_no"]} - {value["title"]} ({value["performer"]})')
+        
+        track_no = value.get("track_no", "")
+        title = value.get("title", "Без названия")
+        performer = value.get("performer", "")
+        index0 = value.get("index0", "")
+        index1 = value.get("index1", "")
+
+        print(f'{track_no}. {performer} - {title} ({index1})')
+        #pprint(value)
+
+# -----------------------------------------------------------
+def save_res(fout, tmp_dict2):
+
+    # Открываем файл в режиме записи ('w')
+    with open(fout, 'w') as file:         #, newline='\r\n'
+        
+        # print ("tmp_dict2")
+
+        for key in tmp_dict2:
+            value = tmp_dict2[key]
+            #print(f'Ключ: {key}')
+            #print(f'Ключ: {value["track_no"]} - {value["title"]} ({value["performer"]})')
+            
+            track_no = value.get("track_no", "")
+            title = value.get("title", "Без названия")
+            performer = value.get("performer", "")
+            index0 = value.get("index0", "")
+            index1 = value.get("index1", "")
+
+            text_line = f'{track_no}. {performer} - {title} ({index1})'
+            #print(text_line)
+            #pprint(value)
+            
+            file.write(text_line + '\n')
+
+# -----------------------------------------------------------
 
 def main():
 
     fn = ''
     fout = ''
+    is_save = 0
+    
     
     '''    
     fn = r"D:\MUSIC\_ATMOS, DTS\Демонстрационный DTS 5.1 CD-Audio #11 (2022)\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA].cue"
@@ -220,9 +248,15 @@ def main():
     print(f'File out - {fout}')
     print()
     
-    if fout and os.path.isfile(fout):
-        print("Этот файл существует")
+    
     '''
+    if fout:
+        if os.path.isfile(fout):
+            #todo Нужно уточнять можно ли перезаписать
+            print("Файл вывода уже существует, он не будет перезаписан.")
+            is_save = 0
+        else:
+            is_save = 1
         
     try:
         with open(fn, 'r') as file:
@@ -237,7 +271,18 @@ def main():
                 return
             '''
             
-            run_parse(content)
+            tmp_dict2 = run_parse(content)
+
+
+            if is_save == 1 and len(tmp_dict2) > 0 and len(fout) > 0:
+                #print(f"Сохранение в файл - {fout}")
+                
+                save_res(fout, tmp_dict2)
+                print(f"Сохранено в файл - {fout}")
+
+            print()
+            show_res(tmp_dict2)
+            
             #print(content)
             
     except FileNotFoundError:
