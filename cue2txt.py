@@ -1,8 +1,10 @@
 
 import sys
+import os
 import re
 from pprint import pprint
 
+# -----------------------------------------------------------
 test_text = '''
 123
 sss
@@ -60,10 +62,12 @@ FILE "Demo DTS CD-Audio #11 [DTS 5.1 CD-DA].wav" WAVE
     INDEX 01 33:46:66
 '''
 
+# -----------------------------------------------------------
 def extract_groups_from_string(text, pattern):
     matches = re.findall(pattern, text)
     return matches
 
+# -----------------------------------------------------------
 def show_res(tmp_dict2):
 
     # print ("tmp_dict2")
@@ -81,7 +85,8 @@ def show_res(tmp_dict2):
 
         print(f'{track_no}. {performer} - {title} ({index1})')
         #pprint(value)
-    
+
+# -----------------------------------------------------------
 def run_parse(content):
         
     content = list(filter(None, content.split('\n')))
@@ -160,34 +165,88 @@ def run_parse(content):
         #print(f'    tmp_dict2: {tmp_dict2}')
         #print(f'    fields_dict: {fields_dict}')
         tmp_dict2[str(key)] = fields_dict
-        
-    show_res(tmp_dict2)
 
-        
+    tmp_dict2)
+    
+
+# -----------------------------------------------------------
+'''
+import chardet
+
+def read_file(filename):
+    with open(filename, 'rb') as f:
+        rawdata = f.read()
+    
+    encoding = chardet.detect(rawdata)['encoding']
+    print(f'Определившаяся кодировка - {encoding}')
+    if not encoding:
+        raise ValueError("Не удалось определить кодировку файла.")
+    
+    return rawdata.decode(encoding)
+'''
+
+# -----------------------------------------------------------
+
 def main():
+
+    fn = ''
+    fout = ''
     
-    filename = "D:\MUSIC\_ATMOS, DTS\Демонстрационный DTS 5.1 CD-Audio #11 (2022)\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA].cue"
-    #filename = "D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\tests\Demo DTS CD-Audio #7 [ALLic].cue"
-    #D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\tests\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA]2.cue
-    if not filename:
-        filename = sys.argv[1]
+    '''    
+    fn = r"D:\MUSIC\_ATMOS, DTS\Демонстрационный DTS 5.1 CD-Audio #11 (2022)\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA].cue"
+
+    # С ошибкой кодировки
+    fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #7 [ALLic].cue"
+    
+    fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #7 [ALLic]_2.cue"
+
+    fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #8_2.cue"
+    # Хороший
+    #fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA]2.cue"
+    '''
+
+    if len(sys.argv) > 1:
+        fn = sys.argv[1]
+        
+    if len(sys.argv) > 2:
+        fout = sys.argv[2]
     
 
-    #if len(sys.argv) != 2:
-    if len(filename) == 0:
+    if len(fn) == 0:
         print("Ошибка: укажите имя текстового файла в качестве аргумента.")
         return
 
+    '''
+    print(f'File - {fn}')
+    print(f'File out - {fout}')
+    print()
+    
+    if fout and os.path.isfile(fout):
+        print("Этот файл существует")
+    '''
+        
     try:
-        with open(filename, 'r') as file:
+        with open(fn, 'r') as file:
             content = file.read()
+
+            '''
+            # Чтение содержимого файла
+            try:
+                content = read_file(fn)
+            except ValueError as e:
+                print(f"Произошла ошибка: {e}")
+                return
+            '''
+            
             run_parse(content)
             #print(content)
             
     except FileNotFoundError:
-        print(f"Файл '{filename}' не найден.")
+        print(f"Файл '{fn}' не найден.")
         
-           
+
+     
+# -----------------------------------------------------------
 
 if __name__ == "__main__":
     main()
