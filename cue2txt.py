@@ -165,9 +165,8 @@ def run_parse(content):
         #print(f'    tmp_dict2: {tmp_dict2}')
         #print(f'    fields_dict: {fields_dict}')
         tmp_dict2[str(key)] = fields_dict
-
-    tmp_dict2)
-    
+        
+    show_res(tmp_dict2)
 
 # -----------------------------------------------------------
 '''
