@@ -35,7 +35,8 @@ from pprint import pprint
     13. Foreigner 1977 - Cold As Ice (66:41:69)
     14. San Francisco Symphony - Ludwig van Beethoven - Symphony No. 5 (70:02:27)
         
-    
+Требования для компиляции и запуска
+    Установить Python
 
 '''
 # -----------------------------------------------------------
@@ -121,28 +122,15 @@ def run_parse(content):
         performer = extract_groups_from_string(el2, r'PERFORMER "(.*)"')
         index0 = extract_groups_from_string(el2, r'INDEX 00 (\d{2}:\d{2}:\d{2})')
         index1 = extract_groups_from_string(el2, r'INDEX 01 (\d{2}:\d{2}:\d{2})')
-        # print(dig)
-        #print(f'track_no - {track_no}')
-        #print(f'title - {title}')
-        # print(el[0])
         if tmp_dict == {}:
-            #print('starts File')
             key2 = str(key)
             tmp_dict.update({key2: []})
         elif el2.startswith("TRACK") and dig[0].isdigit():
-            #print('start track = ' + dig[0])
             old_key = key
             key = int(dig[0]) # key + 1
             key2 = str(key)
             
-            # print(f'  key: {key}')
-            # print(f'  key2: {key2}')
-            #print(f'  len(tmp_dict2): {len(tmp_dict2)}')
-            #print(f'  len(fields_dict): {len(fields_dict)}')
             if len(tmp_dict2) > 0 and len(fields_dict) > 0:
-                #print('  save - fields_dict')
-                # print(f'    tmp_dict2: {tmp_dict2}')
-                #print(f'    fields_dict: {fields_dict}')
                 tmp_dict2[str(old_key)] = fields_dict
                 fields_dict = {};
             
@@ -150,63 +138,28 @@ def run_parse(content):
             fields_dict = dict()
             if track_no:  fields_dict["track_no"] = track_no[0]
             tmp_dict2.update({key2: []})
-            # print(f'tmp_dict2: {tmp_dict2}')
         elif key > 0:
-            # print('new')
             key2 = str(key)
-            # print(f'  key2: {key2}')
             tmp_dict[key2].append(el2)
-            # fields_dict.update({"track_no": "1"})
-            # fields_dict["track_no"] = key2
             if len(title):  fields_dict["title"] = title[0]
             if len(performer):  fields_dict["performer"] = performer[0]
             if len(index0):  fields_dict["index0"] = index0[0]
             if len(index1):  fields_dict["index1"] = index1[0]
         else :
-            #print('new')
             key2 = str(key)
-            # print(f'  key2: {key2}')
             tmp_dict[key2].append(el2)
 
 
-    #print(f'  key: {key}')
-    #print(f'  key2: {key2}')
-    #print(f'  len(tmp_dict2): {len(tmp_dict2)}')
-    #print(f'  len(fields_dict): {len(fields_dict)}')
     if len(tmp_dict2) > 0 and len(fields_dict) > 0:
-        #print('  save - fields_dict')
-        #print(f'    tmp_dict2: {tmp_dict2}')
-        #print(f'    fields_dict: {fields_dict}')
         tmp_dict2[str(key)] = fields_dict
         
     return tmp_dict2
 
 # -----------------------------------------------------------
-# Попытка открытия файла побитно через определение кодировки
-'''
-import chardet
-
-def read_file(filename):
-    with open(filename, 'rb') as f:
-        rawdata = f.read()
-    
-    encoding = chardet.detect(rawdata)['encoding']
-    print(f'Определившаяся кодировка - {encoding}')
-    if not encoding:
-        raise ValueError("Не удалось определить кодировку файла.")
-    
-    return rawdata.decode(encoding)
-'''
-
-# -----------------------------------------------------------
 def show_res(tmp_dict2):
-
-    # print ("tmp_dict2")
 
     for key in tmp_dict2:
         value = tmp_dict2[key]
-        #print(f'Ключ: {key}')
-        #print(f'Ключ: {value["track_no"]} - {value["title"]} ({value["performer"]})')
         
         track_no = value.get("track_no", "")
         title = value.get("title", "Без названия")
@@ -215,20 +168,15 @@ def show_res(tmp_dict2):
         index1 = value.get("index1", "")
 
         print(f'{track_no}. {performer} - {title} ({index1})')
-        #pprint(value)
-
+    
 # -----------------------------------------------------------
 def save_res(fout, tmp_dict2):
 
     # Открываем файл в режиме записи ('w')
     with open(fout, 'w') as file:         #, newline='\r\n'
         
-        # print ("tmp_dict2")
-
         for key in tmp_dict2:
             value = tmp_dict2[key]
-            #print(f'Ключ: {key}')
-            #print(f'Ключ: {value["track_no"]} - {value["title"]} ({value["performer"]})')
             
             track_no = value.get("track_no", "")
             title = value.get("title", "Без названия")
@@ -237,8 +185,6 @@ def save_res(fout, tmp_dict2):
             index1 = value.get("index1", "")
 
             text_line = f'{track_no}. {performer} - {title} ({index1})'
-            #print(text_line)
-            #pprint(value)
             
             file.write(text_line + '\n')
 
@@ -274,20 +220,10 @@ def main():
         with open(fn, 'r') as file:
             content = file.read()
 
-            '''
-            # Чтение содержимого файла
-            try:
-                content = read_file(fn)
-            except ValueError as e:
-                print(f"Произошла ошибка: {e}")
-                return
-            '''
-            
             tmp_dict2 = run_parse(content)
 
 
             if is_need_save == 1 and len(tmp_dict2) > 0 and len(fout) > 0:
-                #print(f"Сохранение в файл - {fout}")
                 
                 save_res(fout, tmp_dict2)
                 print(f"Сохранено в файл - {fout}")
