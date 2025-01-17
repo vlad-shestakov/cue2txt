@@ -179,10 +179,10 @@ def run_parse(content):
         #print(f'    fields_dict: {fields_dict}')
         tmp_dict2[str(key)] = fields_dict
         
-    #show_res(tmp_dict2)
     return tmp_dict2
 
 # -----------------------------------------------------------
+# Попытка открытия файла побитно через определение кодировки
 '''
 import chardet
 
@@ -246,23 +246,10 @@ def save_res(fout, tmp_dict2):
 
 def main():
 
-    fn = ''
-    fout = ''
-    is_save = 0
+    fn      = ''  # Входящий файл .CUE
+    fout    = ''  # Исходящий файл txt (Опционально)
+    is_need_save = 0 # Нужно ли сохранять
     
-    
-    '''    
-    fn = r"D:\MUSIC\_ATMOS, DTS\Демонстрационный DTS 5.1 CD-Audio #11 (2022)\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA].cue"
-
-    # С ошибкой кодировки
-    fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #7 [ALLic].cue"
-    
-    fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #7 [ALLic]_2.cue"
-
-    fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #8_2.cue"
-    # Хороший
-    #fn = r"D:\R_STUDIO\PRG\python\2025-01-17 cue2txt\cue2txt\tests\Demo DTS CD-Audio #11 [DTS 5.1 CD-DA]2.cue"
-    '''
 
     if len(sys.argv) > 1:
         fn = sys.argv[1]
@@ -275,20 +262,13 @@ def main():
         print("Ошибка: укажите имя текстового файла в качестве аргумента.")
         return
 
-    '''
-    print(f'File - {fn}')
-    print(f'File out - {fout}')
-    print()
-    
-    
-    '''
     if fout:
         if os.path.isfile(fout):
             #todo Нужно уточнять можно ли перезаписать
             print("Файл вывода уже существует, он не будет перезаписан.")
-            is_save = 0
+            is_need_save = 0
         else:
-            is_save = 1
+            is_need_save = 1
         
     try:
         with open(fn, 'r') as file:
@@ -306,7 +286,7 @@ def main():
             tmp_dict2 = run_parse(content)
 
 
-            if is_save == 1 and len(tmp_dict2) > 0 and len(fout) > 0:
+            if is_need_save == 1 and len(tmp_dict2) > 0 and len(fout) > 0:
                 #print(f"Сохранение в файл - {fout}")
                 
                 save_res(fout, tmp_dict2)
@@ -314,8 +294,6 @@ def main():
 
             print()
             show_res(tmp_dict2)
-            
-            #print(content)
             
     except FileNotFoundError:
         print(f"Файл '{fn}' не найден.")
